@@ -117,6 +117,7 @@ void registerFunctionsMiscellaneous(FunctionFactory & factory)
     registerFunctionsIn(factory);
     registerFunctionJoinGet(factory);
     registerFunctionFilesystem(factory);
+    registerFunctionFileExists(factory);
     registerFunctionEvalMLMethod(factory);
     registerFunctionBasename(factory);
     registerFunctionTransform(factory);

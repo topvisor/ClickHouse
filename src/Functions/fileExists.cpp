@@ -4,6 +4,8 @@
 #include <DataTypes/DataTypesNumber.h>
 #include <DataTypes/DataTypeString.h>
 
+#include <Columns/ColumnString.h>
+
 #include <Poco/Path.h>
 #include <Poco/File.h>
 

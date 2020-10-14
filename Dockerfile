@@ -15,9 +15,9 @@ ENV CXX g++-9
 COPY . /opt/clickhouse/
 
 WORKDIR /opt/clickhouse/build
-ENTRYPOINT mkdir -p /opt/clickhouse/build
+ENTRYPOINT echo $(pwd)
 
-# RUN mkdir /opt/clickhouse/build && \
+# RUN mkdir -p /opt/clickhouse/build && \
 #    cd /opt/clickhouse/build && \
 #    cmake .. && \
 #    ninja && \

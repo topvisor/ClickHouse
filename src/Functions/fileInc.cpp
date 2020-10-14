@@ -117,7 +117,7 @@ public:
     size_t getNumberOfArguments() const override { return 1; }
     ColumnNumbers getArgumentsThatAreAlwaysConstant() const override { return {1}; }
 
-    DataTypePtr getReturnType(const DataTypes &) const override { return std::make_shared<DataTypeUInt8>(); }
+    DataTypePtr getReturnType(const DataTypes &) const override { return std::make_shared<DataTypeInt64>(); }
 
     FunctionBaseImplPtr build(const ColumnsWithTypeAndName & arguments, const DataTypePtr & return_type) const override
     {

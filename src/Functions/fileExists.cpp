@@ -98,4 +98,9 @@ private:
     const String user_files_path;
 };
 
+void registerFunctionFileExists(FunctionFactory & factory)
+{
+    factory.registerFunction<FunctionOverloadResolverFileExists>(FunctionFactory::CaseInsensitive);
+}
+
 }

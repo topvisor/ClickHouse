@@ -12,13 +12,11 @@ RUN apt-get update -y && \
 ENV CC gcc-9
 ENV CXX g++-9
 
-COPY . /opt/clickhouse/
-
-WORKDIR /opt/clickhouse/build
-ENTRYPOINT echo $(pwd)
-
-# RUN mkdir -p /opt/clickhouse/build && \
-#    cd /opt/clickhouse/build && \
+WORKDIR /opt/clickhouse/
+VOLUME /opt/clickhouse/
+ENTRYPOINT mkdir -p build
+#&& \
+#    cd build && \
 #    cmake .. && \
 #    ninja && \
 #    ninja clickhouse

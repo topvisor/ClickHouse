@@ -18,7 +18,7 @@
 namespace DB
 {
 
-/** fileInc(x) - read integer from file, increment it and write it down. Create file with '1' if it doesn't exist.
+/** fileInc(x) - read integer from file, increment it and write it down. Create file with '0' if it doesn't exist.
   * Returns incremented integer
   */
 class ExecutableFunctionFileInc : public IExecutableFunctionImpl
@@ -57,9 +57,9 @@ public:
 
             if (!file_rb.eof())
                 throw Exception("File must contains only one integer", ErrorCodes::INCORRECT_DATA);
-        }
 
-        file_val++;
+            file_val++;
+        }
 
         WriteBufferFromFile file_wb(file_path.toString(), WRITE_HELPERS_MAX_INT_WIDTH);
         writeIntText(file_val, file_wb);

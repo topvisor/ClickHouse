@@ -1,5 +1,6 @@
 #include <Functions/IFunctionImpl.h>
 #include <Functions/FunctionFactory.h>
+#include <Functions/FunctionHelpers.h>
 
 #include <DataTypes/DataTypesNumber.h>
 #include <DataTypes/DataTypeString.h>

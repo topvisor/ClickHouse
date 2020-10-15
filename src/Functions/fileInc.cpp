@@ -62,12 +62,11 @@ public:
                 throw Exception("File must not be a directory", ErrorCodes::INCORRECT_FILE_NAME);
 
             if (!file.canRead() || !file.canWrite())
-                throw Exception("There is no RW access to file " + file_path.toString(), ErrorCodes::PATH_ACCESS_DENIED);
+                throw Exception("There is no RW access to file", ErrorCodes::PATH_ACCESS_DENIED);
 
             ReadBufferFromFile file_rb(file_path.toString(), WRITE_HELPERS_MAX_INT_WIDTH);
-            readIntText(file_val, file_rb);
 
-            if (!file_rb.eof())
+            if (!tryReadIntText(file_val, file_rb) || !file_rb.eof())
                 throw Exception("File must contains only one integer", ErrorCodes::INCORRECT_DATA);
 
             file_val++;

@@ -1,8 +1,11 @@
 FROM ubuntu:latest
 
 WORKDIR /opt/clickhouse/
+
 VOLUME /opt/clickhouse/
-ENTRYPOINT programs/clickhouse server
+VOLUME /etc/clickhouse-server
+
+ENTRYPOINT programs/clickhouse server --config-file /etc/clickhouse-server/config.xml
 
 #&& \
 #    cd build && \

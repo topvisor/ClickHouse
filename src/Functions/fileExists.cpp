@@ -13,6 +13,12 @@
 namespace DB
 {
 
+namespace ErrorCodes
+{
+extern const int ILLEGAL_COLUMN;
+extern const int PATH_ACCESS_DENIED;
+}
+
 /// fileExists(x) - returns 1 if and only if a file or directory exists
 class ExecutableFunctionFileExists : public IExecutableFunctionImpl
 {

@@ -20,6 +20,14 @@
 namespace DB
 {
 
+namespace ErrorCodes
+{
+extern const int ILLEGAL_COLUMN;
+extern const int INCORRECT_DATA;
+extern const int INCORRECT_FILE_NAME;
+extern const int PATH_ACCESS_DENIED;
+}
+
 /** fileInc(x) - read integer from file, increment it and write it down. Create file with '0' if it doesn't exist.
   * Returns incremented integer
   */

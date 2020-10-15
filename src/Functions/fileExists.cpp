@@ -44,7 +44,10 @@ private:
 class FunctionBaseFileExists : public IFunctionBaseImpl
 {
 public:
-    explicit FunctionBaseFileExists(const String & user_files_path_): user_files_path(user_files_path_) {}
+    explicit FunctionBaseFileExists(const String & user_files_path_, DataTypePtr return_type_)
+        : user_files_path(user_files_path_), return_type(return_type_)
+    {
+    }
 
     static constexpr auto name = "fileExists";
     String getName() const override { return name; }
@@ -52,15 +55,12 @@ public:
     const DataTypes & getArgumentTypes() const override
     {
         DataTypes argument_types;
-        argument_types.emplace_back(std::make_shared<DataTypeString>())
+        argument_types.emplace_back(std::make_shared<DataTypeString>());
 
         return argument_types;
     }
 
-    const DataTypePtr & getReturnType() const override
-    {
-        return std::make_shared<DataTypeUInt8>();
-    }
+    const DataTypePtr & getReturnType() const override { return return_type; }
 
     ExecutableFunctionImplPtr prepare(const Block &, const ColumnNumbers &, size_t) const override
     {
@@ -69,6 +69,7 @@ public:
 
 private:
     const String user_files_path;
+    DataTypePtr return_type;
 };
 
 class FunctionOverloadResolverFileExists : public IFunctionOverloadResolverImpl
@@ -94,7 +95,7 @@ public:
         if (!checkColumnConst<ColumnString>(arguments.at(0).column.get()))
             throw Exception("The argument of function " + getName() + " must be constant String", ErrorCodes::ILLEGAL_COLUMN);
 
-        return std::make_unique<FunctionBaseFileExists>(user_files_path);
+        return std::make_unique<FunctionBaseFileExists>(user_files_path, return_type);
     }
 
 private:

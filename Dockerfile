@@ -1,6 +1,6 @@
 FROM ubuntu:latest
 
-COPY ./build/programs /opt/clickhouse/
+COPY . /opt/clickhouse/
 
 WORKDIR /opt/clickhouse/
 

@@ -53,8 +53,8 @@ public:
         if (!startsWith(file_path.toString(), user_files_path))
             throw Exception("File path " + file_path.toString() + " is not inside " + user_files_path, ErrorCodes::PATH_ACCESS_DENIED);
 
-        Poco::File file = Poco::File(file_path);
         Int64 file_val = 0;
+        Poco::File file = Poco::File(file_path);
 
         if (file.exists())
         {
@@ -70,6 +70,10 @@ public:
                 throw Exception("File must contains only one integer", ErrorCodes::INCORRECT_DATA);
 
             file_val++;
+        }
+        else
+        {
+            Poco::File(file_path.parent()).createDirectories();
         }
 
         WriteBufferFromFile file_wb(file_path.toString(), WRITE_HELPERS_MAX_INT_WIDTH);

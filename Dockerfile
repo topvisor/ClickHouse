@@ -1,8 +1,13 @@
 FROM ubuntu:latest
 
+COPY ./build/programs /opt/clickhouse/
+
 WORKDIR /opt/clickhouse/
-VOLUME /opt/clickhouse/
-ENTRYPOINT programs/clickhouse-server --config-file /etc/clickhouse-server/config.xml 2> /dev/null &
+
+VOLUME /etc/clickhouse-server
+
+ENTRYPOINT ['clickhouse-server']
+CMD ['--config-file', '/etc/clickhouse-server/config.xml']
 
 #&& \
 #    cd build && \

@@ -8,9 +8,3 @@ VOLUME /etc/clickhouse-server
 
 ENTRYPOINT ['clickhouse-server']
 CMD ['--config-file', '/etc/clickhouse-server/config.xml']
-
-#&& \
-#    cd build && \
-#    cmake .. && \
-#    ninja && \
-#    ninja clickhouse

@@ -10,7 +10,7 @@
 #include <Poco/Path.h>
 #include <Poco/File.h>
 
-#include <Common/StringUtils.h>
+#include <Common/StringUtils/StringUtils.h>
 
 namespace DB
 {

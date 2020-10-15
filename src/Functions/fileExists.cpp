@@ -1,3 +1,5 @@
+#include <Interpreters/Context.h>
+
 #include <Functions/IFunctionImpl.h>
 #include <Functions/FunctionFactory.h>
 #include <Functions/FunctionHelpers.h>

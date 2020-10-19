@@ -19,7 +19,7 @@ namespace DB
 
 namespace ErrorCodes
 {
-extern const int ILLEGAL_COLUMN;
+extern const int ILLEGAL_TYPE_OF_ARGUMENT;
 extern const int PATH_ACCESS_DENIED;
 }
 
@@ -54,22 +54,15 @@ private:
 class FunctionBaseFileExists : public IFunctionBaseImpl
 {
 public:
-    explicit FunctionBaseFileExists(const String & user_files_path_, DataTypePtr return_type_)
-        : user_files_path(user_files_path_), return_type(return_type_)
-    {
-    }
+    explicit FunctionBaseFileExists(const String & user_files_path_, DataTypes argument_types_, DataTypePtr return_type_)
+        : user_files_path(user_files_path_)
+        , argument_types(std::move(argument_types_))
+        , return_type(std::move(return_type_)) {}
 
     static constexpr auto name = "fileExists";
     String getName() const override { return name; }
 
-    const DataTypes & getArgumentTypes() const override
-    {
-        DataTypes argument_types;
-        argument_types.emplace_back(std::make_shared<DataTypeString>());
-
-        return argument_types;
-    }
-
+    const DataTypes & getArgumentTypes() const override { return argument_types; }
     const DataTypePtr & getReturnType() const override { return return_type; }
 
     ExecutableFunctionImplPtr prepare(const Block &, const ColumnNumbers &, size_t) const override
@@ -79,6 +72,7 @@ public:
 
 private:
     const String user_files_path;
+    DataTypes argument_types;
     DataTypePtr return_type;
 };
 
@@ -103,9 +97,12 @@ public:
     FunctionBaseImplPtr build(const ColumnsWithTypeAndName & arguments, const DataTypePtr & return_type) const override
     {
         if (!checkColumnConst<ColumnString>(arguments.at(0).column.get()))
-            throw Exception("The argument of function " + getName() + " must be constant String", ErrorCodes::ILLEGAL_COLUMN);
+            throw Exception("The argument of function " + getName() + " must be constant String", ErrorCodes::ILLEGAL_TYPE_OF_ARGUMENT);
 
-        return std::make_unique<FunctionBaseFileExists>(user_files_path, return_type);
+        DataTypes argument_types;
+        argument_types.emplace_back(arguments.at(0).type);
+
+        return std::make_unique<FunctionBaseFileExists>(user_files_path, argument_types, return_type);
     }
 
 private:
@@ -114,7 +111,7 @@ private:
 
 void registerFunctionFileExists(FunctionFactory & factory)
 {
-    factory.registerFunction<FunctionOverloadResolverFileExists>(FunctionFactory::CaseInsensitive);
+    factory.registerFunction<FunctionOverloadResolverFileExists>();
 }
 
 }

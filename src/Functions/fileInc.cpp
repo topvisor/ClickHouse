@@ -35,7 +35,7 @@ public:
     static constexpr auto name = "fileInc";
     String getName() const override { return name; }
 
-    void execute(Block & block, const ColumnNumbers & arguments, size_t result, size_t input_rows_count) override
+    void execute(Block & block, const ColumnNumbers &, size_t result, size_t input_rows_count) override
     {
         block.getByPosition(result).column = DataTypeUInt64().createColumnConst(input_rows_count, num);
     }

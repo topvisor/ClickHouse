@@ -30,25 +30,39 @@ extern const int PATH_ACCESS_DENIED;
 class ExecutableFunctionFileInc : public IExecutableFunctionImpl
 {
 public:
-    explicit ExecutableFunctionFileInc(UInt64 num_) : num(num_) {}
+    explicit ExecutableFunctionFileInc(const String & user_files_path_) : user_files_path{user_files_path_} {}
 
     static constexpr auto name = "fileInc";
     String getName() const override { return name; }
 
-    void execute(Block & block, const ColumnNumbers &, size_t result, size_t input_rows_count) override
+    void execute(Block & block, const ColumnNumbers & arguments, size_t result, size_t input_rows_count) override
     {
-        block.getByPosition(result).column = DataTypeUInt64().createColumnConst(input_rows_count, num);
+        const IColumn * arg_column = block.getByPosition(arguments[0]).column.get();
+        const ColumnString * arg_string = checkAndGetColumnConstData<ColumnString>(arg_column);
+
+        Poco::Path file_path = Poco::Path(arg_string->getDataAt(0).toString());
+        if (file_path.isRelative())
+            file_path = Poco::Path(user_files_path, file_path);
+
+        if (!startsWith(file_path.toString(), user_files_path))
+            throw Exception("File path " + file_path.toString() + " is not inside " + user_files_path, ErrorCodes::PATH_ACCESS_DENIED);
+
+        Poco::File(file_path.parent()).createDirectories();
+
+        auto increment = Increment(file_path.toString());
+
+        block.getByPosition(result).column = DataTypeUInt64().createColumnConst(input_rows_count, increment.get(true));
     }
 
 private:
-    UInt64 num;
+    const String user_files_path;
 };
 
 class FunctionBaseFileInc : public IFunctionBaseImpl
 {
 public:
-    explicit FunctionBaseFileInc(UInt64 num_, DataTypes argument_types_, DataTypePtr return_type_)
-        : num(num_)
+    explicit FunctionBaseFileInc(const String & user_files_path_, DataTypes argument_types_, DataTypePtr return_type_)
+        : user_files_path(user_files_path_)
         , argument_types(std::move(argument_types_))
         , return_type(std::move(return_type_)) {}
 
@@ -58,16 +72,13 @@ public:
     const DataTypes & getArgumentTypes() const override { return argument_types; }
     const DataTypePtr & getReturnType() const override { return return_type; }
 
-    bool isDeterministic() const override { return false; }
-    bool isDeterministicInScopeOfQuery() const override { return true; }
-
     ExecutableFunctionImplPtr prepare(const Block &, const ColumnNumbers &, size_t) const override
     {
-        return std::make_unique<ExecutableFunctionFileInc>(num);
+        return std::make_unique<ExecutableFunctionFileInc>(user_files_path);
     }
 
 private:
-    UInt64 num;
+    const String user_files_path;
     DataTypes argument_types;
     DataTypePtr return_type;
 };
@@ -92,26 +103,13 @@ public:
 
     FunctionBaseImplPtr build(const ColumnsWithTypeAndName & arguments, const DataTypePtr & return_type) const override
     {
-        const IColumn * arg_column = arguments.at(0).column.get();
-        const ColumnString * arg_string = checkAndGetColumnConstData<ColumnString>(arg_column);
-
-        if (!arg_string)
+        if (!checkColumnConst<ColumnString>(arguments.at(0).column.get()))
             throw Exception("The argument of function " + getName() + " must be constant String", ErrorCodes::ILLEGAL_TYPE_OF_ARGUMENT);
 
         DataTypes argument_types;
         argument_types.emplace_back(arguments.at(0).type);
 
-        Poco::Path file_path = Poco::Path(arg_string->getDataAt(0).toString());
-        if (file_path.isRelative())
-            file_path = Poco::Path(user_files_path, file_path);
-
-        if (!startsWith(file_path.toString(), user_files_path))
-            throw Exception("File path " + file_path.toString() + " is not inside " + user_files_path, ErrorCodes::PATH_ACCESS_DENIED);
-
-        Poco::File(file_path.parent()).createDirectories();
-        UInt64 num = Increment(file_path.toString()).get(true);
-
-        return std::make_unique<FunctionBaseFileInc>(num, argument_types, return_type);
+        return std::make_unique<FunctionBaseFileInc>(user_files_path, argument_types, return_type);
     }
 
 private:

@@ -65,6 +65,9 @@ public:
     const DataTypes & getArgumentTypes() const override { return argument_types; }
     const DataTypePtr & getReturnType() const override { return return_type; }
 
+	bool isDeterministic() const override { return false; }
+	bool isDeterministicInScopeOfQuery() const override { return true; }
+
     ExecutableFunctionImplPtr prepare(const Block &, const ColumnNumbers &, size_t) const override
     {
         return std::make_unique<ExecutableFunctionFileExists>(user_files_path);
@@ -93,6 +96,9 @@ public:
     ColumnNumbers getArgumentsThatAreAlwaysConstant() const override { return {1}; }
 
     DataTypePtr getReturnType(const DataTypes &) const override { return std::make_shared<DataTypeUInt8>(); }
+
+	bool isDeterministic() const override { return false; }
+	bool isDeterministicInScopeOfQuery() const override { return true; }
 
     FunctionBaseImplPtr build(const ColumnsWithTypeAndName & arguments, const DataTypePtr & return_type) const override
     {
